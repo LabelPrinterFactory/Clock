@@ -345,7 +345,6 @@ function Stepped(DT) -- DT doesnt stand for deltaTime. it stands for Drake Trove
 
 	end
 end
-CurrentTicks += 11
 RS:BindToRenderStep("ClockLolz",Enum.RenderPriority.Camera.Value+1,Stepped) --ahahaha funny... not really.
 ClickConnection = ClockBase.MouseButton1Down:Connect(function(x: number, y: number) 
 	if CurrentLoops < 32 and GetTicksFromLoops() > 4 then
