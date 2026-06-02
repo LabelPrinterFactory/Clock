@@ -10,6 +10,8 @@ local BaseID = "rbxassetid://116479168303550"
 local HandID ="rbxassetid://92887877691852"
 local OutlinePrimary ="rbxassetid://81173863250339"
 local OutlineSecondary ="rbxassetid://93712476598926"
+local GearID ="rbxassetid://147328632"
+
 local Static ="rbxassetid://569507725"
 
 local TickSound = "rbxassetid://134410911353980"
@@ -85,6 +87,8 @@ function DecrementTicks()
 	end
 end
 
+local GearTextures = {}
+
 local TickSFXInstance = PlaySound(TickSound)
 TickSFXInstance.Volume = 0.4
 CP:PreloadAsync({TickSFXInstance})
@@ -127,6 +131,37 @@ Outline2.Size = UDim2.new(0,134,0,134)
 Outline2.ImageColor3 = Color3.new(0, 0, 0)
 Outline2.Position = UDim2.new(0.2,0,0.8,0)
 table.insert(ItemsTable,Outline2)
+
+local GearTexture = CreateImage(GearID)
+GearTexture.Size = UDim2.new(0,100,0,100)
+GearTexture.ImageColor3 = Color3.new(1, 0.866667, 0.470588)
+GearTexture.Position = UDim2.new(0.215, 0,0.787, 0)
+GearTexture.ZIndex = -1
+GearTexture.Name = "Gear"
+table.insert(ItemsTable,GearTexture)
+table.insert(GearTextures,GearTexture)
+
+local GearTexture2 = CreateImage(GearID)
+GearTexture2.Size = UDim2.new(0,120,0,120)
+GearTexture2.ImageColor3 = Color3.new(1, 0.866667, 0.470588)
+GearTexture2.Position = UDim2.new(0.188, 0,0.788, 0)
+GearTexture2.ZIndex = -1
+GearTexture2.Name = "Gear"
+table.insert(ItemsTable,GearTexture2)
+table.insert(GearTextures,GearTexture2)
+
+local GearTexture3 = CreateImage(GearID)
+GearTexture3.Size = UDim2.new(0,105,0,105)
+GearTexture3.ImageColor3 = Color3.new(1, 0.866667, 0.470588)
+GearTexture3.Position = UDim2.new(0.198, 0,0.831, 0)
+GearTexture3.ZIndex = -1
+GearTexture3.Name = "Gear"
+table.insert(ItemsTable,GearTexture3)
+table.insert(GearTextures,GearTexture3)
+
+for i,v in pairs(GearTextures) do
+	v.ImageTransparency = 0.5
+end
 
 function lerp(start, goal, alpha)
 	--definitely not stolen from starmaq
@@ -276,7 +311,7 @@ function Stepped(DT) -- DT doesnt stand for deltaTime. it stands for Drake Trove
 			Shockwave.Position = UDim2.new(0.2,0,0.8,0)
 			Shockwave.ImageTransparency = 0.7
 			
-			local Tween = TS:Create(Shockwave,TweenInfo.new(10/(10+Speed),Enum.EasingStyle.Cubic,Enum.EasingDirection.Out),{Size=UDim2.new(0,235-(Speed*1),0,235-(Speed*1)),ImageTransparency=1})
+			local Tween = TS:Create(Shockwave,TweenInfo.new(10/(10+Speed),Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Size=UDim2.new(0,235-(Speed*1),0,235-(Speed*1)),ImageTransparency=1})
 			Tween:Play()
 			task.delay(20/(10+Speed),function()
 				Tween = nil -- NULLL!!!! AHAHAHA BAHAHA UR NULL HAHAH
@@ -290,7 +325,7 @@ function Stepped(DT) -- DT doesnt stand for deltaTime. it stands for Drake Trove
 				Shockwave.Position = UDim2.new(0.2,0,0.8,0)
 				Shockwave.ImageTransparency = 0.96
 
-				local Tween = TS:Create(Shockwave,TweenInfo.new(140/(20+Speed),Enum.EasingStyle.Cubic,Enum.EasingDirection.Out),{Size=UDim2.new(0,742,0,742),ImageTransparency=1})
+				local Tween = TS:Create(Shockwave,TweenInfo.new(140/(20+Speed),Enum.EasingStyle.Sine,Enum.EasingDirection.Out),{Size=UDim2.new(0,742,0,742),ImageTransparency=1})
 				Tween:Play()
 				task.delay(255/(20+Speed),function()
 					Tween = nil -- NULLL!!!! AHAHAHA BAHAHA UR NULL HAHAH
@@ -317,6 +352,12 @@ function Stepped(DT) -- DT doesnt stand for deltaTime. it stands for Drake Trove
 		local TickOffset = LastTick + ((math.pi/2)+1)
 		
 		LongHand.Rotation += math.sin(TickOffset*8)*((DT/ (.1+LastTick) )*(30/(1+LastTick))) -- math conglomerate
+	end
+	
+	for i,v in pairs(GearTextures) do
+		if CurrentTicks > 0 then
+			v.Rotation += Speed*(DT*36)
+		end
 	end
 	
 	if CurrentTicks > 12 then
@@ -348,10 +389,11 @@ end
 RS:BindToRenderStep("ClockLolz",Enum.RenderPriority.Camera.Value+1,Stepped) --ahahaha funny... not really.
 ClickConnection = ClockBase.MouseButton1Down:Connect(function(x: number, y: number) 
 	if CurrentLoops < 32 and GetTicksFromLoops() > 4 then
+		local Length = 0.75+(CurrentTicks/30)
 		CurrentLoops = 1
 		CurrentTicks = 0
 		Timer = 0
-		NextTick = 4
+		NextTick = 2+Length
 		LastTick = 5
 		BlastSFXInstance:Play()
 		if CurrentRealLoops < 0.5 then
@@ -362,9 +404,19 @@ ClickConnection = ClockBase.MouseButton1Down:Connect(function(x: number, y: numb
 			Shake += 40
 		end
 		CurrentRealLoops = 0
-		local Length = 1.5+(GetTicksFromLoops()/3)
-		local Tween = TS:Create(LongHand,TweenInfo.new(Length,Enum.EasingStyle.Cubic,Enum.EasingDirection.InOut),{Rotation = GetRotationFromTicks(CurrentTicks)})
+		local Tween = TS:Create(LongHand,TweenInfo.new(Length,Enum.EasingStyle.Cubic,Enum.EasingDirection.Out),{Rotation = GetRotationFromTicks(CurrentTicks)})
 		Tween:Play()
+		task.delay(Length+1,function()
+			Tween = nil
+		end)
+		for i,v in pairs(GearTextures) do
+			local Tween = TS:Create(v,TweenInfo.new(Length+2,Enum.EasingStyle.Cubic,Enum.EasingDirection.InOut),{Rotation = GetRotationFromTicks(CurrentTicks)})
+			Tween:Play()
+			task.delay(Length+2,function()
+				Tween = nil
+			end)
+		end
+
 		task.spawn(function()
 			for i=1,math.round( Length*25 ) do
 				task.wait(1/30)
@@ -379,9 +431,7 @@ ClickConnection = ClockBase.MouseButton1Down:Connect(function(x: number, y: numb
 				OutlineVelocity /= 1.1
 			end
 		end)
-		task.delay(Length+1,function()
-			Tween = nil
-		end)
+
 	end
 end)
 
